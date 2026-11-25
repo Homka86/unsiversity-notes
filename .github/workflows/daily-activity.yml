@@ -1,0 +1,37 @@
+name: Daily activity
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-activity
+  cancel-in-progress: false
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Create one empty daily commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          day="$(TZ=Asia/Yekaterinburg date +%F)"
+          message="Daily activity: $day"
+          if git log --format=%s | grep -Fxq "$message"; then
+            echo "Already recorded for $day."
+            exit 0
+          fi
+          git config user.name "Homka86"
+          git config user.email "168565673+Homka86@users.noreply.github.com"
+          git commit --allow-empty -m "$message"
+          git push origin HEAD:refs/heads/main
