@@ -27,7 +27,7 @@ jobs:
           set -euo pipefail
           day="$(TZ=Asia/Yekaterinburg date +%F)"
           message="Daily activity: $day"
-          if git log --format=%s | grep -Fxq "$message"; then
+          if git log --format=%s | grep -Fx "$message" >/dev/null; then
             echo "Already recorded for $day."
             exit 0
           fi
